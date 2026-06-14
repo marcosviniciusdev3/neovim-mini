@@ -16,76 +16,29 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- 3. Install mini.nvim and set up plugins
-require("lazy").setup({
-  {
-    "echasnovski/mini.nvim",
-    version = false, -- Use the main branch for the latest features
-    config = function()
-      -- 4. Enable the mini modules you want to use
-      -- Every module MUST be explicitly set up. 
+vim.api.nvim_create_autocmd("BufWritePre", {
+pattern = "*.go",
+callback = function()
+-- 1. Ask gopls to organize imports synchronously
+local params = vim.lsp.util.make_range_params()
+params.context = {only = {"source.organizeImports"}}
 
-      -- mini.basics: Sets common sensible defaults and keymaps
-      require("mini.basics").setup()
-
-      -- mini.statusline: A clean and minimal status bar at the bottom
-      require("mini.statusline").setup()
-
-      -- mini.files: A file explorer that lets you edit your file system like a text buffer
-      require("mini.files").setup()
-      -- Map '-' to open the file explorer
-      vim.keymap.set("n", "-", function() require("mini.files").open() end, { desc = "Open mini.files" })
-
-      -- mini.surround: Add, delete, or replace surrounding characters (quotes, brackets)
-      require("mini.surround").setup()
-
-      -- mini.pairs: Automatically close brackets and quotes
-      require("mini.pairs").setup()
-
-      -- mini.icons: Adds file icons (requires a Nerd Font installed on your terminal)
-      require("mini.icons").setup()
-      
-      -- mini.pick: A fast fuzzy finder for files, buffers, and text
-      require("mini.pick").setup()
-      vim.keymap.set("n", "<leader>ff", function() require("mini.pick").builtin.files() end, { desc = "Find Files" })
-      vim.keymap.set("n", "<leader>fg", function() require("mini.pick").builtin.grep_live() end, { desc = "Live Grep" })
-
-      -- mini.colors: Set a built-in colorscheme 
-      require("mini.hues").setup({ background = "#1e1e2e", foreground = "#cdd6f4" })
+-- We use a synchronous request with a 1000ms timeout so the 
+-- file doesn't save until the imports are ready.
+local result = vim.lsp.buf_request_sync(0, "textDocument/codeAction", params, 1000)
+for cid, res in pairs(result or {}) do
+  for _, r in pairs(res.result or {}) do
+    if r.edit then
+      local enc = (vim.lsp.get_client_by_id(cid) or {}).offset_encoding or "utf-16"
+      vim.lsp.util.apply_workspace_edit(r.edit, enc)
     end
-  },
-  {
-  "neovim/nvim-lspconfig",
-  dependencies = {
-    -- Mason handles the downloads
-    "williamboman/mason.nvim",
-    -- Bridges Mason with lspconfig
-    "williamboman/mason-lspconfig.nvim",
-  },
-  config = function()
-    -- 1. Initialize Mason
-    require("mason").setup()
-
-    -- 2. Initialize the bridge and list servers you want automatically installed
-    require("mason-lspconfig").setup({
-      ensure_installed = {
-        "lua_ls", -- Lua
-        -- Add your languages here, e.g.:
-        -- "ts_ls",      -- TypeScript/JavaScript
-        -- "pyright",    -- Python
-        -- "rust_analyzer" -- Rust
-      },
-    })
-
-    -- 3. Automatically wire up every server installed via Mason
-    local lspconfig = require("lspconfig")
-    require("mason-lspconfig").setup_handlers({
-      function(server_name)
-        lspconfig[server_name].setup({})
-      end,
-    })
-    
-    -- 4. Setup Keymaps (See Step 2 below)
   end
-}
+end
+
+-- 2. Format the code (also synchronously)
+vim.lsp.buf.format({ async = false })
+end
 })
+
+-- 3. Install mini.nvim and set up plugins
+require("lazy").setup("plugins")
