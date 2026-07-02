@@ -4,7 +4,16 @@ return {
     config = function()
       -- 4. Enable the mini modules you want to use
       -- Every module MUST be explicitly set up. 
+      local gen_loader = require("mini.snippets").gen_loader
 
+      require("mini.snippets").setup({
+	      snippets = {
+		      gen_loader.from_lang(),
+	}
+      })
+
+
+      require("mini.deps").setup()
       -- mini.basics: Sets common sensible defaults and keymaps
       require("mini.basics").setup()
 
@@ -24,6 +33,7 @@ return {
 
       -- mini.icons: Adds file icons (requires a Nerd Font installed on your terminal)
       require("mini.icons").setup()
+      require("mini.deps").setup()
       
       -- mini.pick: A fast fuzzy finder for files, buffers, and text
       require("mini.pick").setup()

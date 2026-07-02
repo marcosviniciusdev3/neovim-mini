@@ -1,0 +1,37 @@
+{
+  "If Error Check": {
+    "prefix": "err",
+    "body": "if err != nil {\n\treturn ${1:nil}, ${2:err}\n}\n$0",
+    "desc": "Standard error check"
+  },
+  "Main Package and Function": {
+    "prefix": "main",
+    "body": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t$0\n}",
+    "desc": "Boilerplate for an executable Go program"
+  },
+  "For Range Loop": {
+    "prefix": "forr",
+    "body": "for ${1:key}, ${2:val} := range ${3:iterable} {\n\t$0\n}",
+    "desc": "Iterate over a slice or map"
+  },
+  "Struct Definition": {
+    "prefix": "struct",
+    "body": "type ${1:Name} struct {\n\t$0\n}",
+    "desc": "Define a new struct type"
+  },
+  "Interface Definition": {
+    "prefix": "interface",
+    "body": "type ${1:Name} interface {\n\t$0\n}",
+    "desc": "Define a new interface type"
+  },
+  "Goroutine": {
+    "prefix": "go",
+    "body": "go func() {\n\t$0\n}()",
+    "desc": "Anonymous goroutine"
+  },
+  "Table Driven Test": {
+    "prefix": "test",
+    "body": "func Test${1:Function}(t *testing.T) {\n\ttests := []struct {\n\t\tname string\n\t\t// TODO: Add test cases.\n\t}{\n\t\t$0\n\t}\n\n\tfor _, tt := range tests {\n\t\tt.Run(tt.name, func(t *testing.T) {\n\t\t\t// TODO: Add test logic.\n\t\t})\n\t}\n}",
+    "desc": "Standard table-driven test template"
+  }
+}

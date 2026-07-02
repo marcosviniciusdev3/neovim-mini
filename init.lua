@@ -2,6 +2,23 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
+-- Set the number of spaces that a <Tab> in the file counts for
+vim.opt.tabstop = 2
+
+-- Set the number of spaces inserted for each indentation level
+vim.opt.shiftwidth = 2
+
+vim.opt.expandtab = true
+
+-- Enable relative line numbers
+vim.opt.relativenumber = true
+
+-- Keep the current line number highlighted (Hybrid mode)
+vim.opt.number = true
+
+-- Sync Neovim's clipboard with your system clipboard
+vim.opt.clipboard = "unnamedplus"
+
 -- 2. Bootstrap lazy.nvim (the package manager)
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
