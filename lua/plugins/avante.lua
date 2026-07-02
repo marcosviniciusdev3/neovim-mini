@@ -11,10 +11,25 @@ return {
   ---@type avante.Config
   opts = {
     -- Set Gemini as your default provider
-    provider = "gemini",
-    
-    -- Gemini Configuration
+    -- provider = "gemini",
+    provider = "ollama",
+    auto_suggestions_provider = "ollama",
     providers = {
+      ollama = {
+        endpoint = "http://127.0.0.1:11434", -- Your remote server IP
+        model = "qwen2.5-coder:3b",
+        -- is_env_set = require("avante.providers.ollama").check_endpoint_alive,
+        -- Native Ollama API payload options go here
+        timeout = 30000, -- agentic tool loops can be slow, give it room
+        extra_request_body = {
+          options = {
+            temperature = 0,
+            -- num_ctx = 8192, -- Critical: Gives the model a large enough memory for your code
+            num_ctx = 4096,      -- default 20480 will eat RAM you don't have; 4096 is plenty for line/function-level suggestions
+            keep_alive = "30m",
+          }
+        }
+      },
       gemini = {
         model = "gemini-2.5-flash-lite",
         api_key_name = "GEMINI_TOKEN", -- Reads directly from your shell
@@ -31,12 +46,12 @@ return {
         temperature = 0,
       },
       -- Cloudflare Workers AI Configuration (OpenAI Compatible)
-      cloudflare = {
-          __inherited_from = "openai",
-          api_key_name = "CLOUDFLARE_TOKEN",
-          endpoint = "https://api.cloudflare.com/client/v4/accounts/394bc59ef44c708759ca2968ccd9be5c/ai/v1",
-          model = "@cf/zai-org/glm-5.2",
-      },
+      -- cloudflare = {
+      --     __inherited_from = "openai",
+      --     api_key_name = "CLOUDFLARE_TOKEN",
+      --     endpoint = "https://api.cloudflare.com/client/v4/accounts/394bc59ef44c708759ca2968ccd9be5c/ai/v1",
+      --     model = "@cf/zai-org/glm-5.2",
+      -- },
       mistral = {
         __inherited_from = "openai",
         endpoint = "https://api.mistral.ai/v1",
@@ -50,6 +65,10 @@ return {
     -- add any opts here
     -- this file can contain specific instructions for your project
     instructions_file = "avante.md",
+    behaviour = {
+      auto_suggestions = false,  -- this is the actual autocomplete toggle
+      auto_set_keymaps = true,
+    },
   },
   dependencies = {
     "nvim-lua/plenary.nvim",

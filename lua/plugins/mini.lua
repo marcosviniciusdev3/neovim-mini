@@ -9,9 +9,13 @@ return {
       require("mini.snippets").setup({
 	      snippets = {
 		      gen_loader.from_lang(),
-	}
+        }
       })
 
+      require('mini.completion').setup({
+        -- Delay completion slightly so it doesn't instantly choke out the LLM ghost text
+        delay = { completion = 300 },
+      })
 
       require("mini.deps").setup()
       -- mini.basics: Sets common sensible defaults and keymaps
