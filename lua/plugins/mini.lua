@@ -6,6 +6,8 @@ return {
       -- Every module MUST be explicitly set up. 
       local gen_loader = require("mini.snippets").gen_loader
 
+      require("mini.git").setup({})
+
       require("mini.snippets").setup({
 	      snippets = {
 		      gen_loader.from_lang(),
@@ -42,8 +44,10 @@ return {
       -- mini.pick: A fast fuzzy finder for files, buffers, and text
       require("mini.pick").setup()
       vim.keymap.set("n", "<leader>ff", function() require("mini.pick").builtin.files() end, { desc = "Find Files" })
+      vim.keymap.set("n", "<leader>fb", function() require("mini.pick").builtin.buffers() end, { desc = "Find Buffers" })
       vim.keymap.set("n", "<leader>fg", function() require("mini.pick").builtin.grep_live() end, { desc = "Live Grep" })
 
+      require('mini.colors').setup({"wildcharm"})
       -- mini.colors: Set a built-in colorscheme 
       require("mini.hues").setup({ background = "#1e1e2e", foreground = "#cdd6f4" })
 
