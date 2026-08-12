@@ -52,9 +52,55 @@ for cid, res in pairs(result or {}) do
   end
 end
 
+
 -- 2. Format the code (also synchronously)
-vim.lsp.buf.format({ async = false })
-end
+  vim.lsp.buf.format({ async = false })
+  end
+  })
+
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = { 'svelte', 'python', 'javascript', 'typescript', 'typescriptreact', 'rust', 'go', 'c', 'c++' },
+    callback = function()
+        vim.treesitter.start()
+    end,
+})
+
+-- Map Space + q to delete the current buffer
+vim.keymap.set('n', '<leader>q', ':bd<CR>', { desc = 'Delete current buffer' })
+
+-- Vim window key bindings
+-- Navigate between windows in Normal mode
+vim.keymap.set('n', '<C-h>', '<C-w>h', { desc = "Move to left split" })
+vim.keymap.set('n', '<C-j>', '<C-w>j', { desc = "Move to below split" })
+vim.keymap.set('n', '<C-k>', '<C-w>k', { desc = "Move to above split" })
+vim.keymap.set('n', '<C-l>', '<C-w>l', { desc = "Move to right split" })
+
+-- Easily hit ESC to go back to Normal-mode in the terminal
+vim.keymap.set('t', '<Esc><Esc>', [[<C-\><C-n>]], { desc = "Exit terminal mode" })
+
+-- Navigate directly from the terminal without explicitly escaping first
+vim.keymap.set('t', '<C-h>', [[<Cmd>wincmd h<CR>]], { desc = "Move to left split" })
+vim.keymap.set('t', '<C-j>', [[<Cmd>wincmd j<CR>]], { desc = "Move to below split" })
+vim.keymap.set('t', '<C-k>', [[<Cmd>wincmd k<CR>]], { desc = "Move to above split" })
+vim.keymap.set('t', '<C-l>', [[<Cmd>wincmd l<CR>]], { desc = "Move to right split" })
+
+--- Diagnostics
+vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, {
+  desc = "Show line diagnostics",
+})
+vim.keymap.set("n", "]d", function()
+  vim.diagnostic.jump({ count = 1 })
+end)
+vim.keymap.set("n", "[d", function()
+  vim.diagnostic.jump({ count = -1 })
+end)
+
+--- AutoCommand at Startup
+vim.api.nvim_create_autocmd("VimEnter", {
+    callback = function()
+        -- set color scheme to mini.colors 
+        vim.cmd("colorscheme wildcharm")
+    end,
 })
 
 -- 3. Install mini.nvim and set up plugins
