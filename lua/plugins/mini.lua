@@ -46,6 +46,57 @@ return {
       vim.keymap.set("n", "<leader>ff", function() require("mini.pick").builtin.files() end, { desc = "Find Files" })
       vim.keymap.set("n", "<leader>fb", function() require("mini.pick").builtin.buffers() end, { desc = "Find Buffers" })
       vim.keymap.set("n", "<leader>fg", function() require("mini.pick").builtin.grep_live() end, { desc = "Live Grep" })
+      vim.keymap.set("n", "<leader>fa", function()
+        local ignored = {
+          "**/.git/**",
+          "**/.cache/**",
+          "**/.local/**",
+          "**/.var/**",
+          "**/.tmp/**",
+          "**/.gemini/**",
+          "**/.ZAP/**",
+          "**/.libvirt/**",
+          "**/.mozilla/**",
+          "**/.npm/**",
+          "**/.m2/**",
+          "**/.gradle/**",
+          "**/.jdks/**",
+          "**/.java/**",
+          "**/.cargo/**",
+          "**/.rustup/**",
+          "**/.venv/**",
+          "**/.virtualenvs/**",
+          "**/__pycache__/**",
+          "**/node_modules/**",
+          "**/target/**",
+          "**/dist/**",
+          "**/build/**",
+          "**/go/pkg/**",
+          "**/Downloads/**",
+          "**/Pictures/**",
+          "**/Music/**",
+          "**/Videos/**",
+          "**/Porn/**",
+        }
+        local cmd = { "rg", "--files", "--hidden" }
+        for _, pat in ipairs(ignored) do
+          table.insert(cmd, "-g")
+          table.insert(cmd, "!" .. pat)
+        end
+
+        require("mini.pick").builtin.cli(
+          { command = cmd },
+          {
+            source = {
+              name = "Find Files (Home)",
+              cwd = vim.fn.expand("~"),
+              show = function(buf_id, items, query)
+                require("mini.pick").default_show(buf_id, items, query, { show_icons = true })
+              end,
+            },
+          }
+        )
+      end, { desc = "Find Files (Home)" })
 
       require('mini.colors').setup({"wildcharm"})
       -- mini.colors: Set a built-in colorscheme 
