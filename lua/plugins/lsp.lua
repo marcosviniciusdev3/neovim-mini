@@ -13,13 +13,24 @@ return {
     -- 2. Initialize the bridge and list servers you want automatically installed
     require("mason-lspconfig").setup({
       ensure_installed = {
-        "lua_ls", -- Lua
-        -- Add your languages here, e.g.:
-        -- "ts_ls",      -- TypeScript/JavaScript
-        -- "pyright",    -- Python
-        -- "rust_analyzer" -- Rust
+        "lua_ls",       -- Lua
+        -- "ts_ls",        -- TypeScript/JavaScript
+        "eslint",        -- TypeScript/JavaScript
+        "gopls",        -- Go
       },
     })
+    -- 3. Configure/enable the LSP servers via the new Neovim 0.11+ API
+    vim.lsp.config('lua_ls', {
+      settings = {
+        Lua = {
+          diagnostics = {
+            globals = { "vim" },
+          },
+        },
+      },
+    })
+    
+    vim.lsp.enable({ "lua_ls", "eslint", "gopls" })
     
     vim.api.nvim_create_autocmd('LspAttach', {
       desc = 'LSP actions',

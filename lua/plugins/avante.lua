@@ -1,5 +1,6 @@
 return {
   "yetone/avante.nvim",
+  enabled = false,
   -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
   -- ⚠️ must add this setting! ! !
   build = vim.fn.has("win32") ~= 0
@@ -14,10 +15,16 @@ return {
     -- provider = "gemini",
     provider = "ollama",
     auto_suggestions_provider = "ollama",
+    debug = false,
+    behaviour = {
+      auto_suggestions = true,  -- this is the actual autocomplete toggle
+      auto_set_keymaps = true,
+    },
     providers = {
       ollama = {
         endpoint = "http://127.0.0.1:11434", -- Your remote server IP
-        model = "qwen2.5-coder:3b",
+        -- model = "gemma3:4b",
+        model = "granite4.1:3b",
         -- is_env_set = require("avante.providers.ollama").check_endpoint_alive,
         -- Native Ollama API payload options go here
         timeout = 30000, -- agentic tool loops can be slow, give it room
@@ -29,6 +36,7 @@ return {
             keep_alive = "30m",
           }
         }
+        
       },
       gemini = {
         model = "gemini-2.5-flash-lite",
@@ -65,10 +73,6 @@ return {
     -- add any opts here
     -- this file can contain specific instructions for your project
     instructions_file = "avante.md",
-    behaviour = {
-      auto_suggestions = false,  -- this is the actual autocomplete toggle
-      auto_set_keymaps = true,
-    },
   },
   dependencies = {
     "nvim-lua/plenary.nvim",
@@ -95,7 +99,7 @@ return {
             insert_mode = true,
           },
           -- required for Windows users
-          use_absolute_path = true,
+          use_absolute_path = false,
         },
       },
     },

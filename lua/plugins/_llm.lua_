@@ -3,9 +3,8 @@ return {
   event = "InsertEnter",
   opts = {
     backend = "ollama",
-    -- model = "qwen2.5-coder:1.5b",
-    model = "qwen3:4b",
-    url = "http://192.168.0.150:11434/api/generate", -- Your local Ollama endpoint
+    model = "qwen2.5-coder:3b",
+    url = "http://127.0.0.1:11434/api/generate", -- Your local Ollama endpoint
     api_token = "local-bypass", -- Crucial: Prevents a nil string concatenation error
     -- Timing and interactions
     debounce_ms = 300,
