@@ -17,6 +17,7 @@ return {
       require('mini.completion').setup({
         -- Delay completion slightly so it doesn't instantly choke out the LLM ghost text
         delay = { completion = 300 },
+        lsp_completion = { source_func = 'omnifunc', auto_setup = true },
       })
 
       require("mini.deps").setup()

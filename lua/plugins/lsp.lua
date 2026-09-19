@@ -1,53 +1,61 @@
 return {
-  "neovim/nvim-lspconfig",
+  "mason-org/mason-lspconfig.nvim",
   dependencies = {
-    -- Mason handles the downloads
-    "williamboman/mason.nvim",
-    -- Bridges Mason with lspconfig
-    "williamboman/mason-lspconfig.nvim",
+    { "mason-org/mason.nvim", opts = {} },
+    "neovim/nvim-lspconfig",
   },
-  config = function()
-    -- 1. Initialize Mason
-    require("mason").setup()
+  opts = {
+    ensure_installed = {
+      "lua_ls",  -- Lua
+      "gopls",   -- Go
+      "pyright", -- Python
+      -- "ts_ls",
+      -- "eslint",
+    },
+    -- automatic_enable = true is the default — it calls vim.lsp.enable()
+    -- for every installed server, so nothing extra needed below
+  },
+  config = function(_, opts)
+    require("mason-lspconfig").setup(opts)
 
-    -- 2. Initialize the bridge and list servers you want automatically installed
-    require("mason-lspconfig").setup({
-      ensure_installed = {
-        "lua_ls",       -- Lua
-        -- "ts_ls",        -- TypeScript/JavaScript
-        "eslint",        -- TypeScript/JavaScript
-        "gopls",        -- Go
-      },
+    -- Applied to every server before its own vim.lsp.config() override
+    vim.lsp.config('*', {
+      root_markers = { '.git' },
     })
-    -- 3. Configure/enable the LSP servers via the new Neovim 0.11+ API
+
     vim.lsp.config('lua_ls', {
       settings = {
         Lua = {
-          diagnostics = {
-            globals = { "vim" },
-          },
+          diagnostics = { globals = { "vim" } },
         },
       },
     })
-    
-    vim.lsp.enable({ "lua_ls", "eslint", "gopls" })
-    
+
+    vim.lsp.config('gopls', {
+      settings = {
+        gopls = { gofumpt = true, staticcheck = true }
+      },
+    })
+
+
     vim.api.nvim_create_autocmd('LspAttach', {
       desc = 'LSP actions',
       callback = function(event)
-        local opts = {buffer = event.buf}
+        local kopts = { buffer = event.buf }
 
-        vim.keymap.set('n', 'K', '<cmd>lua vim.lsp.buf.hover()<cr>', opts)
-        vim.keymap.set('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>', opts)
-        vim.keymap.set('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>', opts)
-        vim.keymap.set('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<cr>', opts)
-        vim.keymap.set('n', 'go', '<cmd>lua vim.lsp.buf.type_definition()<cr>', opts)
-        vim.keymap.set('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>', opts)
-        vim.keymap.set('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>', opts)
-        vim.keymap.set('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>', opts)
-        vim.keymap.set({'n', 'x'}, '<F3>', '<cmd>lua vim.lsp.buf.format({async = true})<cr>', opts)
-        vim.keymap.set('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>', opts)
+        vim.keymap.set('n', 'K', vim.lsp.buf.hover, kopts)
+        vim.keymap.set('n', 'gd', vim.lsp.buf.definition, kopts)
+        vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, kopts)
+        vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, kopts)
+        vim.keymap.set('n', 'go', vim.lsp.buf.type_definition, kopts)
+        vim.keymap.set('n', 'gr', vim.lsp.buf.references, kopts)
+        vim.keymap.set('n', 'gs', vim.lsp.buf.signature_help, kopts)
+        vim.keymap.set('n', '<F2>', vim.lsp.buf.rename, kopts)
+        vim.keymap.set({ 'n', 'x' }, '<F3>', function()
+          vim.lsp.buf.format({ async = true })
+        end, kopts)
+        vim.keymap.set('n', '<F4>', vim.lsp.buf.code_action, kopts)
       end,
     })
-  end
+  end,
 }
